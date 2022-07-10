@@ -1,0 +1,84 @@
+Package: BG.library
+Type: Package
+Title: Library of functions to analyze BG and sensor data.
+Version: 1.0
+Date: 2019-09-10
+Author: Lillian Gorman Sanisaca
+Maintainer: Lillian Gorman Sanisaca <rscmb_c3@yahoo.com>
+Description: Library of functions to analyze BG and sensor data.  Input files MUST be formatted EXACTLY as the exampleDataset.csv is formatted or the data post user formatting must be in the format of the allData and joinData output dataframes from the dataImport.R function.
+Roxygen: list(markdown=TRUE)
+VignetteBuilder: knitr
+Depends:
+  R(>= 3.5.0),
+  methods
+Imports:
+  data.table,
+  lubridate,
+  RColorBrewer,
+  dplyr,
+  plyr,
+  gplots,
+  plotly,  
+  knitr,
+  rmarkdown,
+  reshape2,
+  shinyWidgets,
+  shiny
+License: GPL (>= 2)
+URL: 
+Collate:
+  'addBGpoints_ly.R'
+  'addBolusPoints_ly.R'
+  'addFasting_ly.R'
+  'addPercentBG_ly.R'
+  'addPumpSetting_ly.R'
+  'addStackbar_ly.R'
+  'barSubPlot_ly.R'
+  'boxBarUI.R'
+  'breakStr.R'
+  'compileInput.R'
+  'convertClass.R'
+  'createSavedPlot.R'
+  'dataImport.R'
+  'dateTimeUI.R'
+  'executeSavedPlot.R'
+  'findCodeStr.R'
+  'fixtables.R'
+  'fromChangeDateRange.R'
+  'generateBGreport.R'
+  'goShinyPlot.R'
+  'heatMap_ly.R'
+  'heatmapUI.R'
+  'historySeq.R'
+  'historySeqOut.R'
+  'historyUI.R'
+  'makeLayout.R'
+  'makePumpSettings.R'
+  'makeXaxis.R'
+  'makeYaxes.R'
+  'makeYaxesSetting.R'
+  'makeYaxesSummary.R'
+  'makeYdomain.R'
+  'named.list.R'
+  'plotLine_ly.R'
+  'prettyTime.R'
+  'removeDupBGs.R'
+  'replaceTitle.R'
+  'savedUI.R'
+  'scatterUI.R'
+  'setTimeStep.R'
+  'setupShinyParams.R'
+  'shinyPlot.R'
+  'shinyReport.R'
+  'subsetData.R'
+  'subsetSetting.R'
+  'summarizeData.R'
+  'summaryLinePlot_ly.R'
+  'summaryPlot_ly.R'
+  'summaryPlotDay_ly.R'
+  'summaryPlotHour_ly.R'
+  'timeDayTable.R'
+  'uniqueDateTime.R'
+  'unPackList.R'
+  'xTicks.R'
+RoxygenNote: 6.1.1

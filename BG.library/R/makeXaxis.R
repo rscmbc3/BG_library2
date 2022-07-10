@@ -1,0 +1,65 @@
+#'@title makeXaxis
+#'@description creates the character string to execute for plot_ly layout of xaxis customized according to 
+#'data selection with multiple axes and scales. Evaluation of output string requires acccess to
+#' `xticksRange` and `xticks`  \\cr \\cr
+#'@param xDomain character string to exectute setting the domain of xaxis (format, "domain = c(0,1),")
+#'@return `xAxis` character string to execute as part of plot_ly layout of the xaxis
+#'@examples
+#'libraryPath<-"F:/BG.library_github/BG.library/"
+#'filePath<-"F:/BG.library_github/exampleData.csv"
+#'dataImport.list<-dataImport(filePath,libraryPath)
+#'data<-dataImport.list$allData
+#'data<-subsetData(data,numberDays = NA,startDate = NA,endDate = NA,filterCond = "",
+#'                 startTime = "00:00", endTime = "23:00",timeStep = "hour",period = 1, 
+#'                 fromChange = TRUE,libraryPath = libraryPath)
+#'#set paramters
+#'addSetting<-""
+#'settingOverlay<- FALSE
+#'legendInset<--0.2
+#'
+#'#format time in decimal hours
+#'xticks.list<-xTicks(data, startTime = "00:00",endTime = "23:00",
+#'                    timeStep = "hour",period = 1)
+#'unPackList(lists = list(xticks.list = xticks.list),
+#'           parentObj = list(NA)) 
+#'#make y axis str
+#'yaxisStr.list<-makeYaxes(addBolusType = "", addSetting,settingOverlay,
+#'                         percentSetting =NA,addBarSub = FALSE,percentBar = NA,yTitle = "")
+#'unPackList(lists = list(yaxisStr.list = yaxisStr.list),
+#'           parentObj = list(NA)) 
+#'unPackList(lists = list(ay.list = ay.list),
+#'           parentObj = list(NA))
+#'ay.list<-yaxisStr.list$ay.list
+#'#get xAxis str
+#'xaxisStr<-makeXaxis(xDomain)
+#'
+#'#make title str
+#'titleStr<-paste0(min(data$Date2)," -to- ",max(data$Date2))
+#'
+#'##make layoutstr
+#'layoutStr<-makeLayout(titleStr,xDomain,xaxisStr,yaxisStr,addGoodRange = FALSE,
+#'                      description = "",descInset =NA)
+#'p<-plot_ly()
+#'#add layout
+#'eval(parse(text = layoutStr))
+#'addBGpoints_ly(p, data)
+
+
+makeXaxis<-function(xDomain){
+
+ xAxis<- paste("xaxis  = list(tickmode = 'array',
+               tickvals = xticksRange,
+               ticks = 'outside',
+               ticktext = xticks,
+               tick0 = xticks[1],",
+                    xDomain,"      
+               #domain = c(0,0.80),
+               zeroline = FALSE,
+               showline = TRUE,
+               tickangle = 60
+               
+  )")
+
+  return(xAxis)
+
+}

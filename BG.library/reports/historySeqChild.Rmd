@@ -1,0 +1,41 @@
+
+
+```{r,eval = TRUE, echo = FALSE,fig.width=10, fig.height=8, warning = FALSE, message = FALSE}
+d <- {{d}}
+endDate<-as.character(dateSeq[d])
+    startDate<-as.character(dateSeq[d+1])
+    
+    
+    changeParam.list<-list(startDate = startDate,
+                           endDate = endDate,
+                           fromChange = FALSE,
+                           removeDates = removeDates)
+    if (!is.na(plotName)){
+         executeSavedPlot(data, numberDays =NA, plotName,changeParam.list, libraryPath)
+
+    }else{#not saved plot
+      
+      #change parameters
+      if (!is.na(changeParam.list[1])){
+        for (c in names(changeParam.list)){
+          eval(parse(text = paste0("paramList$",c,"<-changeParam.list$",c)))
+        }
+      }
+      #unpack paramList
+      unPackList(lists = list(paramList = paramList),
+                 parentObj = list(NA))
+      
+      #format plot params
+      paramStr<-character(0)
+      for (p in 1:length(paramList)){
+        pName<-names(paramList)[p]
+        pStr<-paste0(pName,"=",pName,",")
+        paramStr<-paste0(paramStr,pStr)
+      }
+      paramStr<-paste0(paramStr,"data = data,numberDays = NA")
+      
+      #execute plot
+      execStr<-paste0(plotType,"(",paramStr,")")
+      eval(parse(text = execStr))
+    }
+```

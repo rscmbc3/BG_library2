@@ -1,0 +1,264 @@
+---
+title: 'BG_report for Dates: 2022-07-05 to 2022-07-10'
+author: "Lillian Gorman Sanisaca, rscmb_c3@yahoo.com"
+date: "`r paste0('Report Generated : ',format(Sys.time(), '%m-%d-%Y'))`"
+output: html_document
+params:
+  libraryPath: libraryPath
+  BGfilePath: BGfilePath
+  SGfilePath: SGfilePath
+  numberDays: numberDays
+  fromChange: fromChange
+  startDate: startDate
+  endDate: endDate
+  removeDates: removeDates
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,fig.width=12, fig.height=8, warning = FALSE)
+```
+
+
+```{r, eval=TRUE, echo=FALSE,warning=FALSE, message = FALSE}
+#setPaths
+libraryPath<-params$libraryPath
+BGfilePath<-params$BGfilePath
+SGfilePath<-params$SGfilePath
+numberDays<-params$numberDays
+fromChange<-params$fromChange
+startDate<-params$startDate
+endDate<-params$endDate
+removeDates<-params$removeDates
+
+changeParam.list = list(fromChange = fromChange,
+                        startDate = startDate,
+                        endDate = endDate,
+                        removeDates = removeDates)
+
+#load functions
+suppressWarnings(suppressMessages(devtools::load_all(libraryPath,recompile = FALSE)))
+
+#get pumpSettings
+pumpSettings.list<-makePumpSettings(libraryPath)
+unPackList(lists = list(pumpSettings.list = pumpSettings.list),
+           parentObj = list(NA)) 
+
+#csv data import
+dataImport.list<-dataImport(BGfilePath,SGfilePath,libraryPath)
+unPackList(lists = list(dataImport.list = dataImport.list),
+           parentObj = list(NA)) 
+
+
+#summarize data
+BGvalue_Summary<-summarizeData(allData, colName = "BGvalue", libraryPath = libraryPath,
+                               fromChange = fromChange,startDate = startDate,
+                               endDate = endDate,removeDates = removeDates)
+Sensorvalue_Summary<-summarizeData(allData, colName = "SGvalue", libraryPath = libraryPath,
+                               fromChange = fromChange,startDate = startDate,
+                               endDate = endDate,removeDates = removeDates)
+
+BGvalue_SummaryDaily<-summarizeData(allData, colName = "BGvalue",  timeStep = "day", 
+                                    libraryPath = libraryPath,fromChange = fromChange,startDate = startDate,
+                                    endDate = endDate,removeDates = removeDates)
+BGpercent_Summary<-addPercentBG_ly(data = allData, p = NA,addPercentBG = c("very high","high","good","low"),
+                                   addPercentType = "BGvalue",outputType = "table",
+                                   libraryPath = libraryPath,fromChange = fromChange,startDate = startDate,
+                                   endDate = endDate,removeDates = removeDates)
+SGpercent_Summary<-addPercentBG_ly(data = allData, p = NA,addPercentBG = c("very high","high","good","low"),
+                                   addPercentType = "SGvalue",outputType = "table",
+                                   libraryPath = libraryPath,fromChange = fromChange,startDate = startDate,
+                                   endDate = endDate,removeDates = removeDates)
+BGHigh_Count<-summarizeData(allData, colName = "BGvalue", 
+                            sumFuncs = "length",
+                            filterCond = "data[data$BGvalue>150 & !is.na(data$BGvalue),]",
+                            libraryPath = libraryPath,fromChange = fromChange,startDate = startDate,
+                            endDate = endDate,removeDates = removeDates)
+BGveryHigh_Count<-summarizeData(allData, colName = "BGvalue", 
+                                sumFuncs = "length",
+                                filterCond = "data[data$BGvalue>240 & !is.na(data$BGvalue),]",
+                                libraryPath = libraryPath,fromChange = fromChange,startDate = startDate,
+                                endDate = endDate,removeDates = removeDates)
+
+BGLow_Count<-summarizeData(allData, colName = "BGvalue", 
+                           sumFuncs = "length",
+                           filterCond = "data[data$BGvalue<80 & !is.na(data$BGvalue),]",
+                           libraryPath = libraryPath,fromChange = fromChange,startDate = startDate,
+                           endDate = endDate,removeDates = removeDates)
+BGgood_Count<-summarizeData(allData, colName = "BGvalue", 
+                            sumFuncs = "length",
+                            filterCond = "data[data$BGvalue>=80 & data$BGvalue<=150 & !is.na(data$BGvalue),]",
+                            libraryPath = libraryPath,fromChange = fromChange,startDate = startDate,
+                            endDate = endDate,removeDates = removeDates)
+tempBasal_count<-summarizeData(allData, colName = "Temp.Basal.Amount", 
+                               sumFuncs = "length",
+                               filterCond = "data[data$Temp.Basal.Amount==0 & !is.na(data$Temp.Basal.Amount),]",
+                               libraryPath = libraryPath,fromChange = fromChange,startDate = startDate,
+                               endDate = endDate,removeDates = removeDates)
+suspendBasal_Count<-summarizeData(allData, colName = "Alarm", 
+                                  sumFuncs = "length",
+                                  filterCond = "data[regexpr('SUSPEND',data$Alarm)>0 & !is.na(data$Alarm),]", 
+                                  libraryPath = libraryPath,fromChange = fromChange,startDate = startDate,
+                                  endDate = endDate,removeDates = removeDates)
+
+
+#timeDayTables used for heatmaps
+BGvalue_timeDaytable<-timeDayTable(allData, tcol = "time2", dcol = "Date2", 
+                                   valueVar = "BGvalue", 
+                                   sumFunc = "mean", naRemove = TRUE,
+                                   includeTotals = TRUE,
+                                  filterCond = "",
+                                   libraryPath = libraryPath,fromChange = fromChange,startDate = startDate,
+                                  endDate = endDate,removeDates = removeDates)
+SGvalue_timeDaytable<-timeDayTable(allData, tcol = "time2", dcol = "Date2", 
+                                   valueVar = "SGvalue", 
+                                   sumFunc = "mean", naRemove = TRUE,
+                                   includeTotals = TRUE,
+                                   filterCond = "",
+                                   libraryPath = libraryPath,fromChange = fromChange,startDate = startDate,
+                                   endDate = endDate,removeDates = removeDates)
+
+
+```
+
+##BG value stats by hour
+```{r, eval=TRUE}
+BGvalue_Summary
+```
+##BG value stats by day
+```{r, eval=TRUE}
+BGvalue_SummaryDaily
+```
+
+##Sensor value stats by hour
+```{r, eval=TRUE}
+Sensorvalue_Summary
+```
+
+##BG high (>150) count
+```{r, eval=TRUE}
+BGHigh_Count
+```
+
+##BG very high (>240) count
+```{r, eval=TRUE}
+BGveryHigh_Count
+```
+
+##BG low (<80) count
+```{r, eval=TRUE}
+BGLow_Count
+```
+
+##BG good value count (>80 and <150)
+```{r, eval=TRUE}
+BGgood_Count
+```
+
+##Temp Basal = 0 count
+```{r, eval=TRUE}
+tempBasal_count
+```
+
+##Suspend basal on low count
+```{r, eval=TRUE}
+suspendBasal_Count
+```
+
+
+##BG value by time and date with mean values
+```{r, eval=TRUE,fig.width=10, fig.height=8}
+BGvalue_timeDaytable
+#heatmap
+#heatmaps
+executeSavedPlot(data = allData, plotName = "meanBGheat_hist", libraryPath = libraryPath,
+                 numberDays = numberDays,changeParam.list = changeParam.list)
+
+```
+
+##Sensor value by time and date with mean values
+```{r, eval=TRUE,fig.width=10, fig.height=8}
+SGvalue_timeDaytable
+#heatmap
+#heatmaps
+executeSavedPlot(data = allData, plotName = "meanSGheat_hist", libraryPath = libraryPath,
+                 numberDays = numberDays,changeParam.list = changeParam.list)
+
+```
+
+
+
+##Interactive Plots
+###linePlots
+```{r, eval=TRUE, echo=FALSE,warning=FALSE}
+executeSavedPlot(data = allData, plotName = "lineSumSens_SGper_Sett_BG", libraryPath = libraryPath,
+                 numberDays = numberDays,changeParam.list = changeParam.list)
+executeSavedPlot(data = allData, plotName = "lineSumSens_BGper_Sett_BG", libraryPath = libraryPath,
+                 numberDays = numberDays,changeParam.list = changeParam.list)
+# executeSavedPlot(data = allData, plotName = "lineSumSens_BGper_subCarb_BG", libraryPath = libraryPath,
+#                  numberDays = numberDays,changeParam.list = changeParam.list)
+# executeSavedPlot(data = allData, plotName = "lineSumSens_BGper_subCarb_Sett_BG", libraryPath = libraryPath,
+#                  numberDays = numberDays,changeParam.list = changeParam.list)
+
+```
+
+###barplots hourly
+```{r, eval=TRUE, echo=FALSE,warning=FALSE}
+executeSavedPlot(data = allData, plotName = "sumBar_highBG150_Sett", libraryPath = libraryPath,
+                 numberDays = numberDays,changeParam.list = changeParam.list)
+executeSavedPlot(data = allData, plotName = "sumBar_lowBG80_Sett", libraryPath = libraryPath,
+                 numberDays = numberDays,changeParam.list = changeParam.list)
+# executeSavedPlot(data = allData, plotName = "stackBarInsulinHour_Sett", libraryPath = libraryPath,
+#                  numberDays = numberDays,changeParam.list = changeParam.list)
+executeSavedPlot(data = allData, plotName = "stackBarBGallHour_Sett", libraryPath = libraryPath,
+                 numberDays = numberDays,changeParam.list = changeParam.list)
+```
+
+###every 3 hours barplots
+```{r, eval=TRUE, echo=FALSE,warning=FALSE}
+executeSavedPlot(data = allData, plotName = "stackBarBG3Hour_Sett", libraryPath = libraryPath,
+                 numberDays = numberDays,changeParam.list = changeParam.list)
+# executeSavedPlot(data = allData, plotName = "stackBarInsulin3Hour_Sett", libraryPath = libraryPath,
+#                  numberDays = numberDays,changeParam.list = changeParam.list)
+```
+###daily barplots
+```{r, eval=TRUE, echo=FALSE,warning=FALSE}
+# executeSavedPlot(data = allData, plotName = "stackBarInsulinDaily", libraryPath = libraryPath,
+#                  numberDays = numberDays,changeParam.list = changeParam.list)
+executeSavedPlot(data = allData, plotName = "stackBarBGDaily", libraryPath = libraryPath,
+                 numberDays = numberDays,changeParam.list = changeParam.list)
+executeSavedPlot(data = allData, plotName = "stackBarSGDaily", libraryPath = libraryPath,
+                 numberDays = numberDays,changeParam.list = changeParam.list)
+```
+
+###boxplots hourly
+```{r, eval=TRUE, echo=FALSE,warning=FALSE}
+executeSavedPlot(data = allData, plotName = "boxSGhour_Sett", libraryPath = libraryPath,
+                 numberDays = numberDays,changeParam.list = changeParam.list)
+executeSavedPlot(data = allData, plotName = "boxBGhour_Sett", libraryPath = libraryPath,
+                 numberDays = numberDays,changeParam.list = changeParam.list)
+# executeSavedPlot(data = allData, plotName = "boxCorrUhour_Sett", libraryPath = libraryPath,
+#                  numberDays = numberDays,changeParam.list = changeParam.list)
+# executeSavedPlot(data = allData, plotName = "boxFoodUhour_Sett", libraryPath = libraryPath,
+#                  numberDays = numberDays,changeParam.list = changeParam.list)
+
+```
+
+###3hour boxplots
+```{r, eval=TRUE, echo=FALSE,warning=FALSE}
+executeSavedPlot(data = allData, plotName = "boxSG3hour_Sett", libraryPath = libraryPath,
+                 numberDays = numberDays,changeParam.list = changeParam.list)
+executeSavedPlot(data = allData, plotName = "boxBG3hour_Sett", libraryPath = libraryPath,
+                 numberDays = numberDays,changeParam.list = changeParam.list)
+# executeSavedPlot(data = allData, plotName = "boxCorrU3hour_Sett", libraryPath = libraryPath,
+#                  numberDays = numberDays,changeParam.list = changeParam.list)
+# executeSavedPlot(data = allData, plotName = "boxFoodU3hour_Sett", libraryPath = libraryPath,
+#                  numberDays = numberDays,changeParam.list = changeParam.list)
+```
+
+###daily boxplots
+```{r, eval=TRUE, echo=FALSE,warning=FALSE}
+executeSavedPlot(data = allData, plotName = "boxSGdaily", libraryPath = libraryPath,
+                 numberDays = numberDays,changeParam.list = changeParam.list)
+executeSavedPlot(data = allData, plotName = "boxBGdaily", libraryPath = libraryPath,
+                 numberDays = numberDays,changeParam.list = changeParam.list)
+```
